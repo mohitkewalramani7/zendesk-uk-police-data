@@ -6,7 +6,7 @@ import { DatePicker } from '@zendeskgarden/react-datepickers';
 import { Field, Input } from '@zendeskgarden/react-forms';
 import { Menu, Item } from '@zendeskgarden/react-dropdowns';
 import { Table } from '@zendeskgarden/react-tables';
-import { Well } from '@zendeskgarden/react-notifications';
+import { Alert, Well } from '@zendeskgarden/react-notifications';
 
 import { PALETTE } from '@zendeskgarden/react-theming';
 import { Dots } from '@zendeskgarden/react-loaders';
@@ -19,7 +19,8 @@ const TicketSideBar = () => {
 
   const [dateValue, setDateValue] = useState(new Date())
 
-  const [showCategoriesSearchLoading, setShowCategoriesSearchLoading] = useState(false)
+  const [showLoadingDots, setShowLoadingDots] = useState(false)
+
   const [crimeCategories, setCrimeCategories] = useState({})
   const [selectedCrimeCategory, setSelectedCrimeCategory] = useState(null)
 
@@ -27,12 +28,20 @@ const TicketSideBar = () => {
   const [selectedForce, setSelectedForce] = useState(null)
 
   const [searchResults, setSearchResults] = useState(null)
+  const [showErrorDialog, setShowErrorDialog] = useState(false)
 
   useEffect(() => {
     (async () => {
       client.invoke('resize', { width: '100%', height: '550px' })
     })()
   }, [])
+
+  useEffect(() => {
+    if (showLoadingDots) {
+      const element = document.getElementById("anchor");
+      element.scrollIntoView({behavior: 'smooth', block: 'start'})
+    }
+  }, [showLoadingDots])
 
   useEffect(() => {
     if (selectedCrimeCategory) {
@@ -45,7 +54,7 @@ const TicketSideBar = () => {
   }
 
   async function getCrimeCategories() {
-    setShowCategoriesSearchLoading(true)
+    setShowLoadingDots(true)
     const eventRequestOptions = {
       url: `https://data.police.uk/api/crime-categories?date=2024-01`,
     }
@@ -55,10 +64,11 @@ const TicketSideBar = () => {
       categoriesObject[category.url] = category.name
     })
     setCrimeCategories(categoriesObject)
-    setShowCategoriesSearchLoading(false)
+    setShowLoadingDots(false)
   }
 
   async function getForcesList() {
+    setShowLoadingDots(true)
     const eventRequestOptions = {
       url: `https://data.police.uk/api/forces`,
     }
@@ -68,6 +78,7 @@ const TicketSideBar = () => {
       forcesObject[force.id] = force.name
     })
     setForcesList(forcesObject)
+    setShowLoadingDots(false)
   }
 
   const onCategorySelect = (category) => {
@@ -83,31 +94,39 @@ const TicketSideBar = () => {
   const onForceSelect = (force) => {
     if (force.value) {
       setSelectedForce(force.value)
-      searchCrimes(dateValue.toISOString().slice(0, 7), selectedCrimeCategory, force.value)
+      if (searchResults === null) {
+        searchCrimes(dateValue.toISOString().slice(0, 7), selectedCrimeCategory, force.value)
+      }
     }
   }
 
+  const searchCrimeButtonClick = () => {
+    searchCrimes(dateValue.toISOString().slice(0, 7), selectedCrimeCategory, selectedForce)
+  }
+
   async function searchCrimes(dateString, crimeString, forceString) {
+    setShowLoadingDots(true)
+    setShowErrorDialog(false)
     const eventRequestOptions = {
       url: `https://data.police.uk/api/crimes-no-location?category=${crimeString}&date=${dateString}&force=${forceString}`,
     }
-    console.log(eventRequestOptions.url)
     try {
       const response = await client.request(eventRequestOptions)
       parseSearchResults(response)
     }
     catch (exception) {
-      console.log(exception.status)
+      setShowErrorDialog(true)
+      setSearchResults(null)
     }
+    setShowLoadingDots(false)
   }
 
   function parseSearchResults(searchResults) {
     let parsedSearchResults = searchResults.map(searchResult => ({
       investigationOutcome: searchResult?.outcome_status?.category,
       outcomeDate: searchResult?.outcome_status?.date,
-      monthsToResolution: searchResult?.outcome_status?.date?.split('-')[1] - searchResult.month.split('-')[1]
+      monthsToResolution: Math.abs(searchResult?.outcome_status?.date?.split('-')[1] - searchResult.month.split('-')[1])
     }))
-    console.log(parsedSearchResults)
     setSearchResults(parsedSearchResults)
   }
 
@@ -124,7 +143,6 @@ const TicketSideBar = () => {
         <Button isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px'}} disabled={!isDateValid()} onClick={getCrimeCategories}>
           Search Crime Categories
         </Button>
-        {showCategoriesSearchLoading ? <Dots size={32} color={PALETTE.blue[700]} delayMS={0} /> : null}
         {Object.keys(crimeCategories).length > 0 ? <Menu button="Please Select a Crime Category" onChange={onCategorySelect} style={{marginTop: '20px'}}>
           {Object.keys(crimeCategories).map(url => <Item value={url}>{crimeCategories[url]}</Item>)}
         </Menu> : null}
@@ -134,7 +152,7 @@ const TicketSideBar = () => {
         </Field> : null}
       </Well>
       {Object.keys(forcesList).length > 0 ? <Well style={{marginTop: '20px'}}>
-        <Menu button="Please Select a Force" onChange={onForceSelect} style={{marginTop: '20px'}}>
+        <Menu button="Please Select a Force" onChange={onForceSelect} style={{marginTop: '20px', width: '100%'}}>
           {Object.keys(forcesList).map(id => <Item value={id}>{forcesList[id]}</Item>)}
         </Menu>
         {selectedForce ? <Field>
@@ -142,27 +160,43 @@ const TicketSideBar = () => {
           <Input value={forcesList[selectedForce]} disabled />
         </Field> : null}
       </Well> : null}
-      {showSearchButton() ? <Button isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px'}}>
+      {showSearchButton() ? <Button isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px'}} onClick={searchCrimeButtonClick}>
         Search Again
       </Button> : null}
-      {searchResults != null ? <Table>
-        <Table.Head>
-          <Table.HeaderRow>
-            <Table.HeaderCell>Investigation Outcome</Table.HeaderCell>
-            <Table.HeaderCell>Outcome Month</Table.HeaderCell>
-            <Table.HeaderCell>Months to Resolution</Table.HeaderCell>
-          </Table.HeaderRow>
-        </Table.Head>
-        <Table.Body>
-          {searchResults.map(searchResult =>
-            <Table.Row>
-              <Table.Cell>{searchResult.investigationOutcome}</Table.Cell>
-              <Table.Cell>{searchResult.outcomeDate}</Table.Cell>
-              <Table.Cell>{searchResult.monthsToResolution}</Table.Cell>
-            </Table.Row>
-          )}
-        </Table.Body>
-      </Table>: null}
+      <div id="anchor"></div>
+      {searchResults?.length > 0 ? <div>
+        <Alert type="success">
+          <Alert.Title>Info</Alert.Title>
+          {`${searchResults?.length} Search Results`}
+          </Alert>
+        <Table>
+          <Table.Head>
+            <Table.HeaderRow>
+              <Table.HeaderCell>Investigation Outcome</Table.HeaderCell>
+              <Table.HeaderCell>Outcome Month</Table.HeaderCell>
+              <Table.HeaderCell>Months to Resolution</Table.HeaderCell>
+            </Table.HeaderRow>
+          </Table.Head>
+          <Table.Body>
+            {searchResults.map(searchResult =>
+              <Table.Row>
+                <Table.Cell>{searchResult.investigationOutcome}</Table.Cell>
+                <Table.Cell>{searchResult.outcomeDate}</Table.Cell>
+                <Table.Cell>{searchResult.monthsToResolution}</Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table>
+      </div> : null}
+      {searchResults?.length === 0 ? <Alert type="warning">
+      <Alert.Title>Info</Alert.Title>
+        No search results found for this criteria
+      </Alert> : null}
+      {showErrorDialog ? <Alert type="error">
+      <Alert.Title>Info</Alert.Title>
+        No data available for this date
+      </Alert> : null}
+      {showLoadingDots ? <Dots size={32} color={PALETTE.blue[700]} delayMS={0} style={{width: '100%', marginTop: '20px'}} /> : null}
     </ThemeProvider>
   )
 }
