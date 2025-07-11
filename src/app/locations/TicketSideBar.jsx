@@ -63,9 +63,11 @@ const TicketSideBar = () => {
   const onForceSelect = (force) => {
     if (force.value) {
       setSelectedForce(force.value)
+      /*
       if (searchResults === null) {
         searchCrimes(dateValue.toISOString().slice(0, 7), selectedCrimeCategory, force.value)
       }
+      */
     }
   }
 
@@ -74,7 +76,7 @@ const TicketSideBar = () => {
   }
 
   const renderLoadingDots = () => {
-    return <Dots size={32} delayMS={0} style={{width: '100%', marginTop: '10px'}} /> 
+    return <Dots size={32} delayMS={0} style={{width: '100%', marginTop: '8px'}} /> 
   }
 
   async function getCrimeCategories() {
@@ -116,6 +118,7 @@ const TicketSideBar = () => {
   }
 
   async function searchCrimes(dateString, crimeString, forceString) {
+    setShowErrorDialog(false)
     setShowSearchResultsLoadingDots(true)
     const eventRequestOptions = {
       url: `https://data.police.uk/api/crimes-no-location?category=${crimeString}&date=${dateString}&force=${forceString}`,
@@ -174,7 +177,7 @@ const TicketSideBar = () => {
         </Field> : null}
       </Well> : null}
       {showSearchButton() ? <Button id="anchor" isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px', scrollMarginTop: '50px'}} onClick={searchCrimeButtonClick}>
-        {showSearchResultsLoadingDots ? renderLoadingDots() : 'Search Again'}
+        {showSearchResultsLoadingDots ? renderLoadingDots() : 'Search'}
       </Button> : null}
       {searchResults?.length > 0 ? <div>
         <Alert type="success">
