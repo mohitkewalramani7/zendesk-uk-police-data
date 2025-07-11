@@ -5,27 +5,28 @@ import { Button } from '@zendeskgarden/react-buttons';
 import { DatePicker } from '@zendeskgarden/react-datepickers';
 import { Field, Input } from '@zendeskgarden/react-forms';
 import { Menu, Item } from '@zendeskgarden/react-dropdowns';
+import { Table } from '@zendeskgarden/react-tables';
+import { Well } from '@zendeskgarden/react-notifications';
 
 import { PALETTE } from '@zendeskgarden/react-theming';
 import { Dots } from '@zendeskgarden/react-loaders';
 import { ThemeProvider, DEFAULT_THEME } from '@zendeskgarden/react-theming'
 
-/*
-
-https://data.police.uk/docs/method/crime-categories/
-https://data.police.uk/docs/method/forces/
-https://data.police.uk/docs/method/crimes-no-location/
-
-
-https://data.police.uk/api/crimes-no-location?category=all-crime&date=2022-05&force=leicestershire
-*/
 
 const TicketSideBar = () => {
   const client = useClient()
   const todaysDate = new Date()
 
   const [dateValue, setDateValue] = useState(new Date())
-  const [crimeCategories, setCrimeCategories] = useState([])
+
+  const [showCategoriesSearchLoading, setShowCategoriesSearchLoading] = useState(false)
+  const [crimeCategories, setCrimeCategories] = useState({})
+  const [selectedCrimeCategory, setSelectedCrimeCategory] = useState(null)
+
+  const [forcesList, setForcesList] = useState({})
+  const [selectedForce, setSelectedForce] = useState(null)
+
+  const [searchResults, setSearchResults] = useState(null)
 
   useEffect(() => {
     (async () => {
@@ -33,45 +34,135 @@ const TicketSideBar = () => {
     })()
   }, [])
 
+  useEffect(() => {
+    if (selectedCrimeCategory) {
+      getForcesList()
+    }
+  }, [selectedCrimeCategory])
+
   const isDateValid = () => {
     return dateValue <= todaysDate
   }
 
   async function getCrimeCategories() {
+    setShowCategoriesSearchLoading(true)
     const eventRequestOptions = {
       url: `https://data.police.uk/api/crime-categories?date=2024-01`,
     }
     const response = await client.request(eventRequestOptions)
-    console.log(response)
-    setCrimeCategories(response)
+    let categoriesObject = {}
+    response.forEach(category => {
+      categoriesObject[category.url] = category.name
+    })
+    setCrimeCategories(categoriesObject)
+    setShowCategoriesSearchLoading(false)
+  }
+
+  async function getForcesList() {
+    const eventRequestOptions = {
+      url: `https://data.police.uk/api/forces`,
+    }
+    const response = await client.request(eventRequestOptions)
+    let forcesObject = {}
+    response.forEach(force => {
+      forcesObject[force.id] = force.name
+    })
+    setForcesList(forcesObject)
   }
 
   const onCategorySelect = (category) => {
     if (category.value) {
-      console.log(category.value)
+      setSelectedCrimeCategory(category.value)
     }
+  }
+
+  const showSearchButton = () => {
+    return selectedCrimeCategory != null && selectedForce != null
+  }
+
+  const onForceSelect = (force) => {
+    if (force.value) {
+      setSelectedForce(force.value)
+      searchCrimes(dateValue.toISOString().slice(0, 7), selectedCrimeCategory, force.value)
+    }
+  }
+
+  async function searchCrimes(dateString, crimeString, forceString) {
+    const eventRequestOptions = {
+      url: `https://data.police.uk/api/crimes-no-location?category=${crimeString}&date=${dateString}&force=${forceString}`,
+    }
+    console.log(eventRequestOptions.url)
+    try {
+      const response = await client.request(eventRequestOptions)
+      parseSearchResults(response)
+    }
+    catch (exception) {
+      console.log(exception.status)
+    }
+  }
+
+  function parseSearchResults(searchResults) {
+    let parsedSearchResults = searchResults.map(searchResult => ({
+      investigationOutcome: searchResult?.outcome_status?.category,
+      outcomeDate: searchResult?.outcome_status?.date,
+      monthsToResolution: searchResult?.outcome_status?.date?.split('-')[1] - searchResult.month.split('-')[1]
+    }))
+    console.log(parsedSearchResults)
+    setSearchResults(parsedSearchResults)
   }
 
   return (
     <ThemeProvider theme={{ ...DEFAULT_THEME }}>
       <h1 style={{marginBottom: '40px', fontSize: '30px'}}>UK Police Data</h1>
-      <Field.Label>Select a date</Field.Label>
-      <DatePicker value={dateValue} onChange={setDateValue} maxValue={todaysDate} isCompact>
-        <Input validation={isDateValid() ? undefined : 'error'} />
-      </DatePicker>
-      {!isDateValid() ? <Field.Message validation="error" style={{ marginTop: '8px' }}>
-        Please Select a Date Before or Equal to Today</Field.Message> : null}
-      <Button isPrimary isStretched style={{marginTop: '20px'}} disabled={!isDateValid()} onClick={getCrimeCategories}>
-        Search Crime Categories
-      </Button>
-      {/* <Dots size={32} color={PALETTE.blue[700]} /> */}
-      {crimeCategories.length > 0 ? <Menu button="Choose Category" onChange={onCategorySelect}>
-        {/* <Item value="cactus">Cactus</Item>
-        <Item value="jade">Jade plant</Item>
-        <Item value="echeveria">Echeveria</Item> */}
-        {/* {crimeCategories.forEach(category => console.log(category))} */}
-        {crimeCategories.map(category => <Item value={category.url}>{category.name}</Item>)}
-      </Menu> : null}
+      <Well>
+        <Field.Label>Select a date</Field.Label>
+        <DatePicker value={dateValue} onChange={setDateValue} maxValue={todaysDate} isCompact>
+          <Input validation={isDateValid() ? undefined : 'error'} />
+        </DatePicker>
+        {!isDateValid() ? <Field.Message validation="error" style={{ marginTop: '8px' }}>
+          Please Select a Date Before or Equal to Today</Field.Message> : null}
+        <Button isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px'}} disabled={!isDateValid()} onClick={getCrimeCategories}>
+          Search Crime Categories
+        </Button>
+        {showCategoriesSearchLoading ? <Dots size={32} color={PALETTE.blue[700]} delayMS={0} /> : null}
+        {Object.keys(crimeCategories).length > 0 ? <Menu button="Please Select a Crime Category" onChange={onCategorySelect} style={{marginTop: '20px'}}>
+          {Object.keys(crimeCategories).map(url => <Item value={url}>{crimeCategories[url]}</Item>)}
+        </Menu> : null}
+        {selectedCrimeCategory ? <Field>
+          <Field.Label>Selected Category</Field.Label>
+          <Input value={crimeCategories[selectedCrimeCategory]} disabled />
+        </Field> : null}
+      </Well>
+      {Object.keys(forcesList).length > 0 ? <Well style={{marginTop: '20px'}}>
+        <Menu button="Please Select a Force" onChange={onForceSelect} style={{marginTop: '20px'}}>
+          {Object.keys(forcesList).map(id => <Item value={id}>{forcesList[id]}</Item>)}
+        </Menu>
+        {selectedForce ? <Field>
+          <Field.Label>Selected Category</Field.Label>
+          <Input value={forcesList[selectedForce]} disabled />
+        </Field> : null}
+      </Well> : null}
+      {showSearchButton() ? <Button isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px'}}>
+        Search Again
+      </Button> : null}
+      {searchResults != null ? <Table>
+        <Table.Head>
+          <Table.HeaderRow>
+            <Table.HeaderCell>Investigation Outcome</Table.HeaderCell>
+            <Table.HeaderCell>Outcome Month</Table.HeaderCell>
+            <Table.HeaderCell>Months to Resolution</Table.HeaderCell>
+          </Table.HeaderRow>
+        </Table.Head>
+        <Table.Body>
+          {searchResults.map(searchResult =>
+            <Table.Row>
+              <Table.Cell>{searchResult.investigationOutcome}</Table.Cell>
+              <Table.Cell>{searchResult.outcomeDate}</Table.Cell>
+              <Table.Cell>{searchResult.monthsToResolution}</Table.Cell>
+            </Table.Row>
+          )}
+        </Table.Body>
+      </Table>: null}
     </ThemeProvider>
   )
 }

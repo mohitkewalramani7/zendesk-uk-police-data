@@ -22,6 +22,8 @@
     "@zendeskgarden/react-forms": "^9.7.1",
     "@zendeskgarden/react-grid": "^8.76.3",
     "@zendeskgarden/react-loaders": "^9.7.1",
+    "@zendeskgarden/react-notifications": "^9.7.1",
+    "@zendeskgarden/react-tables": "^9.7.2",
     "@zendeskgarden/react-theming": "^9.0.0",
     "@zendeskgarden/react-typography": "^8.76.3",
     "@zendeskgarden/svg-icons": "^7.6.0",

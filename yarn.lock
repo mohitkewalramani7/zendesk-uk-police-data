@@ -158,7 +158,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.27.1"
 
-"@babel/runtime@^7.1.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.17.8", "@babel/runtime@^7.24.5", "@babel/runtime@^7.8.4":
+"@babel/runtime@^7.1.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.17.8", "@babel/runtime@^7.24.5", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
   version "7.27.6"
   resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.27.6.tgz"
   integrity sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==
@@ -714,6 +714,16 @@
     prop-types "^15.5.7"
     react-merge-refs "^2.0.0"
 
+"@zendeskgarden/react-buttons@^9.7.2":
+  version "9.7.2"
+  resolved "https://registry.npmjs.org/@zendeskgarden/react-buttons/-/react-buttons-9.7.2.tgz"
+  integrity sha512-Y1imwJBYhA6oE5H9v6FTzHpcv/fTtQOp1YjtLEVSsyfrfsVjo4HDAs/V9MEgWSq0ejlJ6MHRo1V9eCL4zhJLHg==
+  dependencies:
+    "@zendeskgarden/container-utilities" "^2.0.0"
+    polished "^4.3.1"
+    prop-types "^15.5.7"
+    react-merge-refs "^2.0.0"
+
 "@zendeskgarden/react-datepickers@^9.7.1":
   version "9.7.1"
   resolved "https://registry.npmjs.org/@zendeskgarden/react-datepickers/-/react-datepickers-9.7.1.tgz"
@@ -774,6 +784,28 @@
   integrity sha512-PN9xvUhvg6P8fokzTavkBsi1rKtx/dBlyj8Vb8dy6sDHMFM8ZGb+ZD8+2PJwmOUslruD+RJx8GKTIh1cvan+nA==
   dependencies:
     "@zendeskgarden/container-schedule" "^2.0.9"
+    polished "^4.3.1"
+    prop-types "^15.5.7"
+
+"@zendeskgarden/react-notifications@^9.7.1":
+  version "9.7.1"
+  resolved "https://registry.npmjs.org/@zendeskgarden/react-notifications/-/react-notifications-9.7.1.tgz"
+  integrity sha512-/H9/qMbZEUNWmqY8mPoGNb9Rhb+kmuzNd00yROBSYy17rz7vClBZ0bvvUvU5mflJSfpPr/HeFumdnmoI1iIc1Q==
+  dependencies:
+    "@zendeskgarden/react-buttons" "^9.7.1"
+    polished "^4.3.1"
+    prop-types "^15.5.7"
+    react-transition-group "^4.4.2"
+    react-uid "^2.3.1"
+
+"@zendeskgarden/react-tables@^9.7.2":
+  version "9.7.2"
+  resolved "https://registry.npmjs.org/@zendeskgarden/react-tables/-/react-tables-9.7.2.tgz"
+  integrity sha512-DT/NzV6MOnRZs7F/PUAp+WvV7EiouKv6nJpYvCgwU1Eh0zlqJk54E7sw/dzzlDZ0CEOtQ4p/RlHAMFUl4qmeuA==
+  dependencies:
+    "@zendeskgarden/container-utilities" "^2.0.0"
+    "@zendeskgarden/react-buttons" "^9.7.2"
+    dom-helpers "^5.1.0"
     polished "^4.3.1"
     prop-types "^15.5.7"
 
@@ -1197,6 +1229,11 @@ cssstyle@^4.0.1:
     "@asamuzakjp/css-color" "^3.2.0"
     rrweb-cssom "^0.8.0"
 
+csstype@^3.0.2:
+  version "3.1.3"
+  resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz"
+  integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
+
 data-urls@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npmjs.org/data-urls/-/data-urls-5.0.0.tgz"
@@ -1324,6 +1361,14 @@ dom-accessibility-api@^0.5.9:
   version "0.5.16"
   resolved "https://registry.npmjs.org/dom-accessibility-api/-/dom-accessibility-api-0.5.16.tgz"
   integrity sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==
+
+dom-helpers@^5.0.1, dom-helpers@^5.1.0:
+  version "5.2.1"
+  resolved "https://registry.npmjs.org/dom-helpers/-/dom-helpers-5.2.1.tgz"
+  integrity sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==
+  dependencies:
+    "@babel/runtime" "^7.8.7"
+    csstype "^3.0.2"
 
 downshift@^9.0.0:
   version "9.0.9"
@@ -2808,7 +2853,7 @@ prism-react-renderer@^1.1.1:
   resolved "https://registry.npmjs.org/prism-react-renderer/-/prism-react-renderer-1.3.5.tgz"
   integrity sha512-IJ+MSwBWKG+SM3b2SUfdrhC+gu01QkV2KmRQgREThBfSQRoufqRfxfHUxpG1WcaFjP+kojcFyO9Qqtpgt3qLCg==
 
-prop-types@^15.0.0, prop-types@^15.5.7, prop-types@^15.6.1, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@^15.0.0, prop-types@^15.5.7, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -2839,7 +2884,7 @@ queue-microtask@^1.2.2:
   resolved "https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
 
-"react-dom@^16.8.0 || ^17.0.0 || ^18.0.0", "react-dom@^16.8.0 || 17.x", "react-dom@^18.0.0 || ^19.0.0", react-dom@^18.2.0, "react-dom@>= 16.8.0", react-dom@>=16.8.0, "react-dom@16.8.0 - 18":
+"react-dom@^16.8.0 || ^17.0.0 || ^18.0.0", "react-dom@^16.8.0 || 17.x", "react-dom@^18.0.0 || ^19.0.0", react-dom@^18.2.0, "react-dom@>= 16.8.0", react-dom@>=16.6.0, react-dom@>=16.8.0, "react-dom@16.8.0 - 18":
   version "18.3.1"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz"
   integrity sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==
@@ -2900,14 +2945,24 @@ react-refresh@^0.17.0:
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.17.0.tgz"
   integrity sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==
 
-react-uid@^2.2.0:
+react-transition-group@^4.4.2:
+  version "4.4.5"
+  resolved "https://registry.npmjs.org/react-transition-group/-/react-transition-group-4.4.5.tgz"
+  integrity sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==
+  dependencies:
+    "@babel/runtime" "^7.5.5"
+    dom-helpers "^5.0.1"
+    loose-envify "^1.4.0"
+    prop-types "^15.6.2"
+
+react-uid@^2.2.0, react-uid@^2.3.1:
   version "2.4.0"
   resolved "https://registry.npmjs.org/react-uid/-/react-uid-2.4.0.tgz"
   integrity sha512-+MVs/25NrcZuGrmlVRWPOSsbS8y72GJOBsR7d68j3/wqOrRBF52U29XAw4+XSelw0Vm6s5VmGH5mCbTCPGVCVg==
   dependencies:
     tslib "^2.0.0"
 
-"react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || 17.x", "react@^18.0.0 || ^19.0.0", react@^18.2.0, react@^18.3.1, "react@>= 16.8.0", react@>=0.14.0, react@>=0.14.9, react@>=16.12.0, react@>=16.8.0, "react@0.14.x || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@16.8.0 - 18":
+"react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || 17.x", "react@^18.0.0 || ^19.0.0", react@^18.2.0, react@^18.3.1, "react@>= 16.8.0", react@>=0.14.0, react@>=0.14.9, react@>=16.12.0, react@>=16.6.0, react@>=16.8.0, "react@0.14.x || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@16.8.0 - 18":
   version "18.3.1"
   resolved "https://registry.npmjs.org/react/-/react-18.3.1.tgz"
   integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
