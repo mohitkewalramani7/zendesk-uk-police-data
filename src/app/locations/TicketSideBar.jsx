@@ -21,6 +21,8 @@ const TicketSideBar = () => {
 
   const [showLoadingDots, setShowLoadingDots] = useState(false)
 
+  const [showApiErrorDialog, setShowApiErrorDialog] = useState(false)
+
   const [crimeCategories, setCrimeCategories] = useState({})
   const [selectedCrimeCategory, setSelectedCrimeCategory] = useState(null)
 
@@ -53,34 +55,6 @@ const TicketSideBar = () => {
     return dateValue <= todaysDate
   }
 
-  async function getCrimeCategories() {
-    setShowLoadingDots(true)
-    const eventRequestOptions = {
-      url: `https://data.police.uk/api/crime-categories?date=2024-01`,
-    }
-    const response = await client.request(eventRequestOptions)
-    let categoriesObject = {}
-    response.forEach(category => {
-      categoriesObject[category.url] = category.name
-    })
-    setCrimeCategories(categoriesObject)
-    setShowLoadingDots(false)
-  }
-
-  async function getForcesList() {
-    setShowLoadingDots(true)
-    const eventRequestOptions = {
-      url: `https://data.police.uk/api/forces`,
-    }
-    const response = await client.request(eventRequestOptions)
-    let forcesObject = {}
-    response.forEach(force => {
-      forcesObject[force.id] = force.name
-    })
-    setForcesList(forcesObject)
-    setShowLoadingDots(false)
-  }
-
   const onCategorySelect = (category) => {
     if (category.value) {
       setSelectedCrimeCategory(category.value)
@@ -102,6 +76,44 @@ const TicketSideBar = () => {
 
   const searchCrimeButtonClick = () => {
     searchCrimes(dateValue.toISOString().slice(0, 7), selectedCrimeCategory, selectedForce)
+  }
+
+  async function getCrimeCategories() {
+    setShowLoadingDots(true)
+    try {
+      const eventRequestOptions = {
+        url: `https://data.police.uk/api/crime-categoriess?date=2024-01`,
+      }
+      const response = await client.request(eventRequestOptions)
+      let categoriesObject = {}
+      response.forEach(category => {
+        categoriesObject[category.url] = category.name
+      })
+      setCrimeCategories(categoriesObject)
+    }
+    catch(exception) {
+      setShowApiErrorDialog(true)
+    }
+    setShowLoadingDots(false)
+  }
+
+  async function getForcesList() {
+    setShowLoadingDots(true)
+    try {
+      const eventRequestOptions = {
+        url: `https://data.police.uk/api/forcess`,
+      }
+      const response = await client.request(eventRequestOptions)
+      let forcesObject = {}
+      response.forEach(force => {
+        forcesObject[force.id] = force.name
+      })
+      setForcesList(forcesObject)
+    }
+    catch(exception) {
+      setShowApiErrorDialog(true)
+    }
+    setShowLoadingDots(false)
   }
 
   async function searchCrimes(dateString, crimeString, forceString) {
@@ -189,12 +201,16 @@ const TicketSideBar = () => {
         </Table>
       </div> : null}
       {searchResults?.length === 0 ? <Alert type="warning">
-      <Alert.Title>Info</Alert.Title>
+      <Alert.Title>No Results</Alert.Title>
         No search results found for this criteria
       </Alert> : null}
       {showErrorDialog ? <Alert type="error">
-      <Alert.Title>Info</Alert.Title>
+      <Alert.Title>No Data</Alert.Title>
         No data available for this date
+      </Alert> : null}
+      {showApiErrorDialog ? <Alert type="error" style={{marginTop: '20px'}}>
+      <Alert.Title>Site Error</Alert.Title>
+        Error Accessing API, please try again later
       </Alert> : null}
       {showLoadingDots ? <Dots size={32} color={PALETTE.blue[700]} delayMS={0} style={{width: '100%', marginTop: '20px'}} /> : null}
     </ThemeProvider>
