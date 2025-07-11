@@ -82,7 +82,7 @@ const TicketSideBar = () => {
     setShowLoadingDots(true)
     try {
       const eventRequestOptions = {
-        url: `https://data.police.uk/api/crime-categoriess?date=2024-01`,
+        url: `https://data.police.uk/api/crime-categories?date=2024-01`,
       }
       const response = await client.request(eventRequestOptions)
       let categoriesObject = {}
@@ -101,7 +101,7 @@ const TicketSideBar = () => {
     setShowLoadingDots(true)
     try {
       const eventRequestOptions = {
-        url: `https://data.police.uk/api/forcess`,
+        url: `https://data.police.uk/api/forces`,
       }
       const response = await client.request(eventRequestOptions)
       let forcesObject = {}
