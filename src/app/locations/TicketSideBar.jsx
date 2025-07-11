@@ -19,7 +19,9 @@ const TicketSideBar = () => {
 
   const [dateValue, setDateValue] = useState(new Date())
 
-  const [showLoadingDots, setShowLoadingDots] = useState(false)
+  const [showCategoryLoadingDots, setShowCategoryLoadingDots] = useState(false)
+  const [showForcesLoadingDots, setShowForcesLoadingDots] = useState(false)
+  const [showSearchResultsLoadingDots, setShowSearchResultsLoadingDots] = useState(false)
 
   const [showApiErrorDialog, setShowApiErrorDialog] = useState(false)
 
@@ -37,13 +39,6 @@ const TicketSideBar = () => {
       client.invoke('resize', { width: '100%', height: '550px' })
     })()
   }, [])
-
-  useEffect(() => {
-    if (showLoadingDots) {
-      const element = document.getElementById("anchor");
-      element.scrollIntoView({behavior: 'smooth', block: 'start'})
-    }
-  }, [showLoadingDots])
 
   useEffect(() => {
     if (selectedCrimeCategory) {
@@ -78,8 +73,12 @@ const TicketSideBar = () => {
     searchCrimes(dateValue.toISOString().slice(0, 7), selectedCrimeCategory, selectedForce)
   }
 
+  const renderLoadingDots = () => {
+    return <Dots size={32} delayMS={0} style={{width: '100%', marginTop: '10px'}} /> 
+  }
+
   async function getCrimeCategories() {
-    setShowLoadingDots(true)
+    setShowCategoryLoadingDots(true)
     try {
       const eventRequestOptions = {
         url: `https://data.police.uk/api/crime-categories?date=2024-01`,
@@ -94,11 +93,11 @@ const TicketSideBar = () => {
     catch(exception) {
       setShowApiErrorDialog(true)
     }
-    setShowLoadingDots(false)
+    setShowCategoryLoadingDots(false)
   }
 
   async function getForcesList() {
-    setShowLoadingDots(true)
+    setShowForcesLoadingDots(true)
     try {
       const eventRequestOptions = {
         url: `https://data.police.uk/api/forces`,
@@ -113,12 +112,11 @@ const TicketSideBar = () => {
     catch(exception) {
       setShowApiErrorDialog(true)
     }
-    setShowLoadingDots(false)
+    setShowForcesLoadingDots(false)
   }
 
   async function searchCrimes(dateString, crimeString, forceString) {
-    setShowLoadingDots(true)
-    setShowErrorDialog(false)
+    setShowSearchResultsLoadingDots(true)
     const eventRequestOptions = {
       url: `https://data.police.uk/api/crimes-no-location?category=${crimeString}&date=${dateString}&force=${forceString}`,
     }
@@ -130,7 +128,9 @@ const TicketSideBar = () => {
       setShowErrorDialog(true)
       setSearchResults(null)
     }
-    setShowLoadingDots(false)
+    const element = document.getElementById("anchor");
+    element.scrollIntoView({behavior: 'smooth', block: 'start'})
+    setShowSearchResultsLoadingDots(false)
   }
 
   function parseSearchResults(searchResults) {
@@ -153,7 +153,7 @@ const TicketSideBar = () => {
         {!isDateValid() ? <Field.Message validation="error" style={{ marginTop: '8px' }}>
           Please Select a Date Before or Equal to Today</Field.Message> : null}
         <Button isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px'}} disabled={!isDateValid()} onClick={getCrimeCategories}>
-          Search Crime Categories
+          {showCategoryLoadingDots ? renderLoadingDots() : 'Search Crime Categories'}
         </Button>
         {Object.keys(crimeCategories).length > 0 ? <Menu button="Please Select a Crime Category" onChange={onCategorySelect} style={{marginTop: '20px'}}>
           {Object.keys(crimeCategories).map(url => <Item value={url}>{crimeCategories[url]}</Item>)}
@@ -163,6 +163,7 @@ const TicketSideBar = () => {
           <Input value={crimeCategories[selectedCrimeCategory]} disabled />
         </Field> : null}
       </Well>
+      {showForcesLoadingDots ? renderLoadingDots() : null}
       {Object.keys(forcesList).length > 0 ? <Well style={{marginTop: '20px'}}>
         <Menu button="Please Select a Force" onChange={onForceSelect} style={{marginTop: '20px', width: '100%'}}>
           {Object.keys(forcesList).map(id => <Item value={id}>{forcesList[id]}</Item>)}
@@ -172,10 +173,9 @@ const TicketSideBar = () => {
           <Input value={forcesList[selectedForce]} disabled />
         </Field> : null}
       </Well> : null}
-      {showSearchButton() ? <Button isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px'}} onClick={searchCrimeButtonClick}>
-        Search Again
+      {showSearchButton() ? <Button id="anchor" isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px', scrollMarginTop: '50px'}} onClick={searchCrimeButtonClick}>
+        {showSearchResultsLoadingDots ? renderLoadingDots() : 'Search Again'}
       </Button> : null}
-      <div id="anchor"></div>
       {searchResults?.length > 0 ? <div>
         <Alert type="success">
           <Alert.Title>Info</Alert.Title>
@@ -212,7 +212,6 @@ const TicketSideBar = () => {
       <Alert.Title>Site Error</Alert.Title>
         Error Accessing API, please try again later
       </Alert> : null}
-      {showLoadingDots ? <Dots size={32} color={PALETTE.blue[700]} delayMS={0} style={{width: '100%', marginTop: '20px'}} /> : null}
     </ThemeProvider>
   )
 }
