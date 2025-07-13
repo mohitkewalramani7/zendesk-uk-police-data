@@ -8,8 +8,7 @@ import { Menu, Item } from '@zendeskgarden/react-dropdowns';
 import { Table } from '@zendeskgarden/react-tables';
 import { Alert, Well } from '@zendeskgarden/react-notifications';
 
-import { PALETTE } from '@zendeskgarden/react-theming';
-import { Dots } from '@zendeskgarden/react-loaders';
+import { Inline } from '@zendeskgarden/react-loaders';
 import { ThemeProvider, DEFAULT_THEME } from '@zendeskgarden/react-theming'
 
 
@@ -76,7 +75,7 @@ const TicketSideBar = () => {
   }
 
   const renderLoadingDots = () => {
-    return <Dots size={32} delayMS={0} style={{width: '100%', marginTop: '8px'}} /> 
+    return <Inline size={32} delayMS={0} className="dots-spacing" /> 
   }
 
   async function getCrimeCategories() {
@@ -147,40 +146,40 @@ const TicketSideBar = () => {
 
   return (
     <ThemeProvider theme={{ ...DEFAULT_THEME }}>
-      <h1 style={{marginBottom: '40px', fontSize: '30px'}}>UK Police Data</h1>
+      <h1>UK Police Data</h1>
       <Well>
         <Field.Label>Select a date</Field.Label>
         <DatePicker value={dateValue} onChange={setDateValue} maxValue={todaysDate} isCompact>
           <Input validation={isDateValid() ? undefined : 'error'} />
         </DatePicker>
-        {!isDateValid() ? <Field.Message validation="error" style={{ marginTop: '8px' }}>
+        {!isDateValid() ? <Field.Message validation="error">
           Please Select a Date Before or Equal to Today</Field.Message> : null}
-        <Button isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px'}} disabled={!isDateValid()} onClick={getCrimeCategories}>
+        <Button isPrimary isStretched className="button-margin" disabled={!isDateValid()} onClick={getCrimeCategories}>
           {showCategoryLoadingDots ? renderLoadingDots() : 'Search Crime Categories'}
         </Button>
-        {Object.keys(crimeCategories).length > 0 ? <Menu button="Please Select a Crime Category" onChange={onCategorySelect} style={{marginTop: '20px'}}>
+        {Object.keys(crimeCategories).length > 0 ? <Menu button="Please Select a Crime Category" onChange={onCategorySelect}>
           {Object.keys(crimeCategories).map(url => <Item value={url}>{crimeCategories[url]}</Item>)}
         </Menu> : null}
-        {selectedCrimeCategory ? <Field>
+        {selectedCrimeCategory ? <Field className="input-field">
           <Field.Label>Selected Category</Field.Label>
           <Input value={crimeCategories[selectedCrimeCategory]} disabled />
         </Field> : null}
       </Well>
       {showForcesLoadingDots ? renderLoadingDots() : null}
-      {Object.keys(forcesList).length > 0 ? <Well style={{marginTop: '20px'}}>
-        <Menu button="Please Select a Force" onChange={onForceSelect} style={{marginTop: '20px', width: '100%'}}>
+      {Object.keys(forcesList).length > 0 ? <Well className="well-spacing">
+        <Menu button="Please Select a Force" onChange={onForceSelect} className="button-margin">
           {Object.keys(forcesList).map(id => <Item value={id}>{forcesList[id]}</Item>)}
         </Menu>
-        {selectedForce ? <Field>
+        {selectedForce ? <Field className="input-field">
           <Field.Label>Selected Category</Field.Label>
           <Input value={forcesList[selectedForce]} disabled />
         </Field> : null}
       </Well> : null}
-      {showSearchButton() ? <Button id="anchor" isPrimary isStretched style={{marginTop: '20px', marginBottom: '10px', scrollMarginTop: '50px'}} onClick={searchCrimeButtonClick}>
+      {showSearchButton() ? <Button id="anchor" isPrimary isStretched className="button-margin" onClick={searchCrimeButtonClick}>
         {showSearchResultsLoadingDots ? renderLoadingDots() : 'Search'}
       </Button> : null}
       {searchResults?.length > 0 ? <div>
-        <Alert type="success">
+        <Alert type="success" className="notification-banners">
           <Alert.Title>Info</Alert.Title>
           {`${searchResults?.length} Search Results`}
           </Alert>
@@ -203,15 +202,15 @@ const TicketSideBar = () => {
           </Table.Body>
         </Table>
       </div> : null}
-      {searchResults?.length === 0 ? <Alert type="warning">
+      {searchResults?.length === 0 ? <Alert type="warning" className="notification-banners">
       <Alert.Title>No Results</Alert.Title>
         No search results found for this criteria
       </Alert> : null}
-      {showErrorDialog ? <Alert type="error">
+      {showErrorDialog ? <Alert type="error" className="notification-banners">
       <Alert.Title>No Data</Alert.Title>
         No data available for this date
       </Alert> : null}
-      {showApiErrorDialog ? <Alert type="error" style={{marginTop: '20px'}}>
+      {showApiErrorDialog ? <Alert type="error" className="notification-banners">
       <Alert.Title>Site Error</Alert.Title>
         Error Accessing API, please try again later
       </Alert> : null}

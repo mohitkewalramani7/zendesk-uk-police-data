@@ -20,6 +20,33 @@ body {
   min-height: 100dvh;
 }
 
+h1 {
+  margin-bottom: 40px;
+  font-size: 30px;
+}
+
+.dots-spacing {
+  width: 100%;
+}
+
+.cDHAph.button-margin {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.gCKCOu.input-field {
+  margin-top: 10px;
+}
+
+.well-spacing {
+  margin-top: 20px;
+}
+
+.notification-banners {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
